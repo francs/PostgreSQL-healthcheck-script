@@ -1,0 +1,816 @@
+###############################    PostgreSQL 数据库巡检报告    #####################################
+一 数据库基本信息
+内核版本：2.6.32-220.el6.i686
+数据库版本：PostgreSQL 9.3.0
+
+数据库编译配置信息:
+BINDIR = /opt/pgsql9.3.0/bin
+DOCDIR = /opt/pgsql9.3.0/share/doc
+HTMLDIR = /opt/pgsql9.3.0/share/doc
+INCLUDEDIR = /opt/pgsql9.3.0/include
+PKGINCLUDEDIR = /opt/pgsql9.3.0/include
+INCLUDEDIR-SERVER = /opt/pgsql9.3.0/include/server
+LIBDIR = /opt/pgsql9.3.0/lib
+PKGLIBDIR = /opt/pgsql9.3.0/lib
+LOCALEDIR = /opt/pgsql9.3.0/share/locale
+MANDIR = /opt/pgsql9.3.0/share/man
+SHAREDIR = /opt/pgsql9.3.0/share
+SYSCONFDIR = /opt/pgsql9.3.0/etc
+PGXS = /opt/pgsql9.3.0/lib/pgxs/src/makefiles/pgxs.mk
+CONFIGURE = '--prefix=/opt/pgsql9.3.0' '--with-pgport=1925' '--with-wal-blocksize=16' '--with-perl' '--with-python' '--with-openssl' '--with-pam' '--with-ldap' '--with-libxml' '--with-libxslt' '--enable-thread-safety'
+CC = gcc
+CPPFLAGS = -D_GNU_SOURCE -I/usr/include/libxml2
+CFLAGS = -O2 -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv
+CFLAGS_SL = -fpic
+LDFLAGS = -L../../../src/common -Wl,--as-needed -Wl,-rpath,'/opt/pgsql9.3.0/lib',--enable-new-dtags
+LDFLAGS_EX = 
+LDFLAGS_SL = 
+LIBS = -lpgport -lpgcommon -lxslt -lxml2 -lpam -lssl -lcrypto -lz -lreadline -lcrypt -ldl -lm 
+VERSION = PostgreSQL 9.3.0
+
+
+二 数据库配置
+--2.1 postgresql.conf
+md5值:981fdf76afcc12d5758c24cf197b72ff  /database/pg93/pg_root/postgresql.conf
+
+非默认值:
+listen_addresses = '*'		# what IP address(es) to listen on;
+port = 1925				# (change requires restart)
+max_connections = 500			# (change requires restart)
+superuser_reserved_connections = 3	# (change requires restart)
+unix_socket_directories = '/tmp'	# comma-separated list of directories
+shared_buffers = 128MB			# min 128kB
+work_mem = 1MB				# min 64kB
+maintenance_work_mem = 128MB		# min 1MB
+bgwriter_delay = 10ms			# 10-10000ms between rounds
+wal_level = hot_standby			# minimal, archive, or hot_standby
+fsync = on				# turns forced synchronization on or off
+synchronous_commit = off		# synchronization level;
+checkpoint_segments = 16		# in logfile segments, min 1, 16MB each
+checkpoint_timeout = 30min		# range 30s-1h
+checkpoint_completion_target = 0.5	# checkpoint target duration, 0.0 - 1.0
+archive_mode = on		# allows archiving to be done
+archive_command = '/bin/date'		# command to use to archive a logfile segment
+archive_timeout = 0		# force a logfile segment switch after this
+max_wal_senders = 8		# max number of walsender processes
+wal_keep_segments = 32		# in logfile segments, 16MB each; 0 disables
+hot_standby = on			# "on" allows queries during recovery
+log_destination = 'csvlog'		# Valid values are combinations of
+logging_collector = on		# Enable capturing of stderr and csvlog
+log_directory = 'pg_log'		# directory where log files are written,
+log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'	# log file name pattern,
+log_file_mode = 0600			# creation mode for log files,
+log_truncate_on_rotation = off		# If on, an existing log file with the
+log_rotation_age = 1d			# Automatic rotation of logfiles will
+log_rotation_size = 10MB		# Automatic rotation of logfiles will
+log_min_duration_statement = 100	# -1 is disabled, 0 logs all statements
+log_checkpoints = on
+log_connections = on
+log_disconnections = on
+log_timezone = 'PRC'
+autovacuum = on			# Enable autovacuum subprocess?  'on'
+log_autovacuum_min_duration = -1	# -1 disables, 0 logs all actions and
+autovacuum_max_workers = 3		# max number of autovacuum subprocesses
+datestyle = 'iso, mdy'
+timezone = 'PRC'
+lc_messages = 'C'			# locale for system error message
+lc_monetary = 'C'			# locale for monetary formatting
+lc_numeric = 'C'			# locale for number formatting
+lc_time = 'C'				# locale for time formatting
+default_text_search_config = 'pg_catalog.english'
+shared_preload_libraries = 'pg_stat_statements'
+pg_stat_statements.max = 10000
+pg_stat_statements.track = all
+
+--2.2 pg_hba.conf
+md5值:76261b92d1df1f7f09b50ed63bdaa59d  /database/pg93/pg_root/pg_hba.conf
+
+非默认值:
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+host	all	all	0.0.0.0/0	md5
+
+--2.3 recovery.conf
+WARNING: recovery.conf/recovery.done 恢复配置文件不存在。
+
+
+三 最近一个月 csvlog 日志中的错误分类和次数(如果日志量大，这步执行时间会较长。)
+    203 ERROR 42601
+     73 FATAL 3D000
+     59 WARNING 01000
+     19 ERROR 42703
+     14 ERROR 42704
+     13 ERROR 42883
+      9 ERROR 42P16
+      9 ERROR 42P07
+      9 ERROR 42501
+      8 ERROR 42P01
+      8 ERROR 23505
+      6 FATAL 28P01
+      5 ERROR 58P01
+      4 FATAL 57P01
+      4 ERROR 42P02
+      4 ERROR 22023
+      3 ERROR 57014
+      3 ERROR 25P02
+      2 FATAL 55000
+      2 ERROR 55006
+      2 ERROR 42P04
+      2 ERROR 42809
+      2 ERROR 25001
+      2 ERROR 22P02
+      2 ERROR 2201B
+      1 FATAL 28000
+      1 ERROR 55000
+      1 ERROR 42710
+
+
+四 定时任务
+
+
+五 数据库对像信息
+
+--5.1 表空间信息
+                      List of tablespaces
+     Name      |  Owner   |              Location               
+---------------+----------+-------------------------------------
+ pg_default    | postgres | 
+ pg_global     | postgres | 
+ tbs_francs    | postgres | /database/pg93/pg_tbs/tbs_francs
+ tbs_source_db | postgres | /database/pg93/pg_tbs/tbs_source_db
+(4 rows)
+
+
+--5.2 数据库信息
+  datname  | rolname  | pg_encoding_to_char | datcollate | datctype | pg_size_pretty 
+-----------+----------+---------------------+------------+----------+----------------
+ francs    | postgres | UTF8                | C          | C        | 18 MB
+ francs1   | postgres | UTF8                | C          | C        | 18 MB
+ source_db | postgres | UTF8                | C          | C        | 12 MB
+ skytf     | postgres | UTF8                | C          | C        | 6225 kB
+ db1       | postgres | UTF8                | C          | C        | 6209 kB
+ db2       | postgres | UTF8                | C          | C        | 6209 kB
+ db3       | postgres | SQL_ASCII           | C          | C        | 6209 kB
+(7 rows)
+
+
+--5.3 用户/角色信息
+                              List of roles
+  Role name  |                   Attributes                   | Member of 
+-------------+------------------------------------------------+-----------
+ dwetl       | No inheritance                                +| {}
+             | 10 connections                                +| 
+             | Password valid until infinity                  | 
+ francs      | No inheritance                                 | {}
+ postgres    | Superuser, Create role, Create DB, Replication | {}
+ repuser     | Replication                                   +| {}
+             | 2 connections                                  | 
+ select_only | No inheritance                                 | {}
+ source_db   | No inheritance                                 | {}
+
+
+
+六 自上次巡检以来的TOP 10 SQL
+--6.1 CPU耗时TOP 10
+SQL:select t1.datname, t2.query, t2.calls, t2.total_time, t2.total_time/t2.calls 单次调用cpu耗时 from pg_database t1, pg_stat_statements t2 where t1.oid=t2.dbid order by t2.total_time desc limit 10;
+
+datname         | francs
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3159.786
+单次调用cpu耗时 | 51.7997704918033
+
+datname         | francs1
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3093.702
+单次调用cpu耗时 | 50.7164262295082
+
+datname         | source_db
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3025.948
+单次调用cpu耗时 | 49.6057049180328
+
+datname         | db1
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3025.437
+单次调用cpu耗时 | 49.5973278688525
+
+datname         | skytf
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3016.387
+单次调用cpu耗时 | 49.4489672131147
+
+datname         | db2
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 2941.115
+单次调用cpu耗时 | 48.215
+
+datname         | db3
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 2864.371
+单次调用cpu耗时 | 46.9569016393443
+
+datname         | francs
+query           | select * from 
+                | (
+                | SELECT
+                |   current_database() AS db, schemaname, tablename, reltuples::bigint AS tups, relpages::bigint AS pages, otta,
+                |   ROUND(CASE WHEN otta=? OR sml.relpages=? OR sml.relpages=otta THEN ? ELSE sml.relpages/otta::numeric END,?) AS tbloat,
+                |   CASE WHEN relpages < otta THEN ? ELSE relpages::bigint - otta END AS wastedpages,
+                |   CASE WHEN relpages < otta THEN ? ELSE bs*(sml.relpages-otta)::bigint END AS wastedbytes,
+                |   CASE WHEN relpages < otta THEN ?::text ELSE (bs*(relpages-otta))::bigint || ? END AS wastedsize,
+                |   iname, ituples::bigint AS itups, ipages::bigint AS ipages, iotta,
+                |   ROUND(CASE WHEN iotta=? OR ipages=? OR ipages=iotta THEN ? ELSE ipages/iotta::numeric END,?) AS ibloat,
+                |   CASE WHEN ipages < iotta THEN ? ELSE ipages::bigint - iotta END AS wastedipages,
+                |   CASE WHEN ipages < iotta THEN ? ELSE bs*(ipages-iotta) END AS wastedibytes,
+                |   CASE WHEN ipages < iotta THEN ? ELSE (bs*(ipages-iotta))::bigint || ? END AS wastedisize,
+                |   CASE WHEN relpages < otta THEN
+                |     CASE WHEN ipages < iotta THEN
+calls           | 61
+total_time      | 1463.117
+单次调用cpu耗时 | 23.9855245901639
+
+datname         | francs1
+query           | select * from 
+                | (
+                | SELECT
+                |   current_database() AS db, schemaname, tablename, reltuples::bigint AS tups, relpages::bigint AS pages, otta,
+                |   ROUND(CASE WHEN otta=? OR sml.relpages=? OR sml.relpages=otta THEN ? ELSE sml.relpages/otta::numeric END,?) AS tbloat,
+                |   CASE WHEN relpages < otta THEN ? ELSE relpages::bigint - otta END AS wastedpages,
+                |   CASE WHEN relpages < otta THEN ? ELSE bs*(sml.relpages-otta)::bigint END AS wastedbytes,
+                |   CASE WHEN relpages < otta THEN ?::text ELSE (bs*(relpages-otta))::bigint || ? END AS wastedsize,
+                |   iname, ituples::bigint AS itups, ipages::bigint AS ipages, iotta,
+                |   ROUND(CASE WHEN iotta=? OR ipages=? OR ipages=iotta THEN ? ELSE ipages/iotta::numeric END,?) AS ibloat,
+                |   CASE WHEN ipages < iotta THEN ? ELSE ipages::bigint - iotta END AS wastedipages,
+                |   CASE WHEN ipages < iotta THEN ? ELSE bs*(ipages-iotta) END AS wastedibytes,
+                |   CASE WHEN ipages < iotta THEN ? ELSE (bs*(ipages-iotta))::bigint || ? END AS wastedisize,
+                |   CASE WHEN relpages < otta THEN
+                |     CASE WHEN ipages < iotta THEN
+calls           | 61
+total_time      | 1407.319
+单次调用cpu耗时 | 23.0708032786885
+
+datname         | db1
+query           | select * from 
+                | (
+                | SELECT
+                |   current_database() AS db, schemaname, tablename, reltuples::bigint AS tups, relpages::bigint AS pages, otta,
+                |   ROUND(CASE WHEN otta=? OR sml.relpages=? OR sml.relpages=otta THEN ? ELSE sml.relpages/otta::numeric END,?) AS tbloat,
+                |   CASE WHEN relpages < otta THEN ? ELSE relpages::bigint - otta END AS wastedpages,
+                |   CASE WHEN relpages < otta THEN ? ELSE bs*(sml.relpages-otta)::bigint END AS wastedbytes,
+                |   CASE WHEN relpages < otta THEN ?::text ELSE (bs*(relpages-otta))::bigint || ? END AS wastedsize,
+                |   iname, ituples::bigint AS itups, ipages::bigint AS ipages, iotta,
+                |   ROUND(CASE WHEN iotta=? OR ipages=? OR ipages=iotta THEN ? ELSE ipages/iotta::numeric END,?) AS ibloat,
+                |   CASE WHEN ipages < iotta THEN ? ELSE ipages::bigint - iotta END AS wastedipages,
+                |   CASE WHEN ipages < iotta THEN ? ELSE bs*(ipages-iotta) END AS wastedibytes,
+                |   CASE WHEN ipages < iotta THEN ? ELSE (bs*(ipages-iotta))::bigint || ? END AS wastedisize,
+                |   CASE WHEN relpages < otta THEN
+                |     CASE WHEN ipages < iotta THEN
+calls           | 61
+total_time      | 1209.366
+单次调用cpu耗时 | 19.8256721311475
+
+--6.2 调用次数TOP10
+SQL:select t1.datname, t2.query, t2.calls, t2.total_time, t2.total_time/t2.calls 单次调用cpu耗时 from pg_database t1, pg_stat_statements t2 where t1.oid=t2.dbid order by t2.calls desc limit 10;
+
+datname         | francs
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 36966
+total_time      | 136.99599999999
+单次调用cpu耗时 | 0.00370600010820727
+
+datname         | francs1
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 36539
+total_time      | 135.537999999993
+单次调用cpu耗时 | 0.00370940638769514
+
+datname         | source_db
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 30378
+total_time      | 112.532000000011
+单次调用cpu耗时 | 0.0037043913358355
+
+datname         | skytf
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 30256
+total_time      | 112.686000000011
+单次调用cpu耗时 | 0.00372441829719763
+
+datname         | db3
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 30134
+total_time      | 110.657000000011
+单次调用cpu耗时 | 0.00367216433264788
+
+datname         | db2
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 30134
+total_time      | 112.542000000012
+单次调用cpu耗时 | 0.00373471825844602
+
+datname         | db1
+query           | select pg_catalog.substring($1, pg_catalog.similar_escape($2, $3))
+calls           | 30134
+total_time      | 121.051000000014
+单次调用cpu耗时 | 0.00401709032986044
+
+datname         | postgres
+query           | select datname from pg_database where datname not in (?,?,?) order by 1;
+calls           | 390
+total_time      | 32.231
+单次调用cpu耗时 | 0.0826435897435898
+
+datname         | postgres
+query           | select version();
+calls           | 85
+total_time      | 3.616
+单次调用cpu耗时 | 0.0425411764705882
+
+datname         | postgres
+query           | select ? where exists (select extname from pg_extension where extname=?);
+calls           | 83
+total_time      | 3.684
+单次调用cpu耗时 | 0.0443855421686747
+
+--6.3 单次耗时TOP 10
+SQL: select t1.datname, t2.query, t2.calls, t2.total_time, t2.total_time/t2.calls 单次调用cpu耗时 from pg_database t1, pg_stat_statements t2 where t1.oid=t2.dbid order by t2.total_time/t2.calls desc limit 10;
+datname         | francs
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3159.786
+单次调用cpu耗时 | 51.7997704918033
+
+datname         | francs1
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3093.702
+单次调用cpu耗时 | 50.7164262295082
+
+datname         | source_db
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3025.948
+单次调用cpu耗时 | 49.6057049180328
+
+datname         | db1
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3025.437
+单次调用cpu耗时 | 49.5973278688525
+
+datname         | skytf
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 3016.387
+单次调用cpu耗时 | 49.4489672131147
+
+datname         | db2
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 2941.115
+单次调用cpu耗时 | 48.215
+
+datname         | db3
+query           | select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<? and t2.schemaname not in (?,?) and indexrelid not in (select conindid from pg_constraint where contype in (?,?)) and pg_relation_size(indexrelid)>? order by pg_relation_size(indexrelid) desc;
+calls           | 61
+total_time      | 2864.371
+单次调用cpu耗时 | 46.9569016393443
+
+datname         | postgres
+query           | select datname,datdba,encoding,datcollate,datctype,pg_size_pretty(pg_database_size(datname)) "size GB"from pg_database 
+                | where datname not in (?,?,?) order by pg_database_size(datname) desc;
+calls           | 3
+total_time      | 83.049
+单次调用cpu耗时 | 27.683
+
+datname         | postgres
+query           | select datname,datdba,encoding,datcollate,datctype,pg_size_pretty(pg_database_size(datname)) "size GB"from pg_database 
+                | order by pg_database_size(datname) desc;
+calls           | 1
+total_time      | 24.256
+单次调用cpu耗时 | 24.256
+
+datname         | francs
+query           | select * from 
+                | (
+                | SELECT
+                |   current_database() AS db, schemaname, tablename, reltuples::bigint AS tups, relpages::bigint AS pages, otta,
+                |   ROUND(CASE WHEN otta=? OR sml.relpages=? OR sml.relpages=otta THEN ? ELSE sml.relpages/otta::numeric END,?) AS tbloat,
+                |   CASE WHEN relpages < otta THEN ? ELSE relpages::bigint - otta END AS wastedpages,
+                |   CASE WHEN relpages < otta THEN ? ELSE bs*(sml.relpages-otta)::bigint END AS wastedbytes,
+                |   CASE WHEN relpages < otta THEN ?::text ELSE (bs*(relpages-otta))::bigint || ? END AS wastedsize,
+                |   iname, ituples::bigint AS itups, ipages::bigint AS ipages, iotta,
+                |   ROUND(CASE WHEN iotta=? OR ipages=? OR ipages=iotta THEN ? ELSE ipages/iotta::numeric END,?) AS ibloat,
+                |   CASE WHEN ipages < iotta THEN ? ELSE ipages::bigint - iotta END AS wastedipages,
+                |   CASE WHEN ipages < iotta THEN ? ELSE bs*(ipages-iotta) END AS wastedibytes,
+                |   CASE WHEN ipages < iotta THEN ? ELSE (bs*(ipages-iotta))::bigint || ? END AS wastedisize,
+                |   CASE WHEN relpages < otta THEN
+                |     CASE WHEN ipages < iotta THEN
+calls           | 61
+total_time      | 1463.117
+单次调用cpu耗时 | 23.9855245901639
+
+
+
+七 数据库运行状态巡检
+--7.1 连接数
+ 可用连接数 | 已使用连接数 | 剩余连接数 
+------------+--------------+------------
+ 500        |            1 |        499
+(1 row)
+
+
+--7.2 年龄大于10亿的数据库
+ datname | age 
+---------+-----
+(0 rows)
+
+
+
+--7.3 多库检查
+
+
+########### sql1: 查询大于10GB的表以及年龄 ###############
+sql1: select relname,age(relfrozenxid),pg_relation_size(oid)/1024/1024/1024.0 表大小GB from pg_class where relkind='r' and pg_relation_size(oid)/1024/1024/1024.0 > 10 order by 3 desc;
+##### 数据库 db1 
+ relname | age | 表大小gb 
+---------+-----+----------
+(0 rows)
+
+##### 数据库 db2 
+ relname | age | 表大小gb 
+---------+-----+----------
+(0 rows)
+
+##### 数据库 db3 
+ relname | age | 表大小gb 
+---------+-----+-------------
+(0 rows)
+
+##### 数据库 francs 
+ relname | age | 表大小gb 
+---------+-----+----------
+(0 rows)
+
+##### 数据库 francs1 
+ relname | age | 表大小gb 
+---------+-----+----------
+(0 rows)
+
+##### 数据库 skytf 
+ relname | age | 表大小gb 
+---------+-----+----------
+(0 rows)
+
+##### 数据库 source_db 
+ relname | age | 表大小gb 
+---------+-----+----------
+(0 rows)
+
+
+
+########### sql2: 索引数超过4的表 ###############
+sql2: select t2.nspname, t1.relname, t3.idx_cnt from pg_class t1, pg_namespace t2, (select indrelid,count(*) idx_cnt from pg_index group by 1 having count(*)>4) t3 where t1.oid=t3.indrelid and t1.relnamespace=t2.oid order by t3.idx_cnt desc;
+##### 数据库 db1 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+##### 数据库 db2 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+##### 数据库 db3 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+##### 数据库 francs 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+##### 数据库 francs1 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+##### 数据库 skytf 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+##### 数据库 source_db 
+ nspname | relname | idx_cnt 
+---------+---------+---------
+(0 rows)
+
+
+
+########### sql3: 上次巡检以来未使用或使用较少的索引 ###############
+sql3: select t2.schemaname,t2.relname,t2.indexrelname,t2.idx_scan,t2.idx_tup_read,t2.idx_tup_fetch,pg_relation_size(indexrelid) from pg_stat_all_tables t1,pg_stat_all_indexes t2 where t1.relid=t2.relid and t2.idx_scan<1000 and t2.schemaname not in ('pg_toast','pg_catalog') and indexrelid not in (select conindid from pg_constraint where contype in ('p','u')) and pg_relation_size(indexrelid)>6553600 order by pg_relation_size(indexrelid) desc;
+##### 数据库 db1 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+##### 数据库 db2 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+##### 数据库 db3 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+##### 数据库 francs 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+##### 数据库 francs1 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+##### 数据库 skytf 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+##### 数据库 source_db 
+ schemaname | relname | indexrelname | idx_scan | idx_tup_read | idx_tup_fetch | pg_relation_size 
+------------+---------+--------------+----------+--------------+---------------+------------------
+(0 rows)
+
+
+
+########### sql4: 膨胀检查 ###############
+sql4: select * from 
+(
+SELECT
+  current_database() AS db, schemaname, tablename, reltuples::bigint AS tups, relpages::bigint AS pages, otta,
+  ROUND(CASE WHEN otta=0 OR sml.relpages=0 OR sml.relpages=otta THEN 0.0 ELSE sml.relpages/otta::numeric END,1) AS tbloat,
+  CASE WHEN relpages < otta THEN 0 ELSE relpages::bigint - otta END AS wastedpages,
+  CASE WHEN relpages < otta THEN 0 ELSE bs*(sml.relpages-otta)::bigint END AS wastedbytes,
+  CASE WHEN relpages < otta THEN '0 bytes'::text ELSE (bs*(relpages-otta))::bigint || ' bytes' END AS wastedsize,
+  iname, ituples::bigint AS itups, ipages::bigint AS ipages, iotta,
+  ROUND(CASE WHEN iotta=0 OR ipages=0 OR ipages=iotta THEN 0.0 ELSE ipages/iotta::numeric END,1) AS ibloat,
+  CASE WHEN ipages < iotta THEN 0 ELSE ipages::bigint - iotta END AS wastedipages,
+  CASE WHEN ipages < iotta THEN 0 ELSE bs*(ipages-iotta) END AS wastedibytes,
+  CASE WHEN ipages < iotta THEN '0 bytes' ELSE (bs*(ipages-iotta))::bigint || ' bytes' END AS wastedisize,
+  CASE WHEN relpages < otta THEN
+    CASE WHEN ipages < iotta THEN 0 ELSE bs*(ipages-iotta::bigint) END
+    ELSE CASE WHEN ipages < iotta THEN bs*(relpages-otta::bigint)
+      ELSE bs*(relpages-otta::bigint + ipages-iotta::bigint) END
+  END AS totalwastedbytes
+FROM (
+  SELECT
+    nn.nspname AS schemaname,
+    cc.relname AS tablename,
+    COALESCE(cc.reltuples,0) AS reltuples,
+    COALESCE(cc.relpages,0) AS relpages,
+    COALESCE(bs,0) AS bs,
+    COALESCE(CEIL((cc.reltuples*((datahdr+ma-
+      (CASE WHEN datahdr%ma=0 THEN ma ELSE datahdr%ma END))+nullhdr2+4))/(bs-20::float)),0) AS otta,
+    COALESCE(c2.relname,'?') AS iname, COALESCE(c2.reltuples,0) AS ituples, COALESCE(c2.relpages,0) AS ipages,
+    COALESCE(CEIL((c2.reltuples*(datahdr-12))/(bs-20::float)),0) AS iotta -- very rough approximation, assumes all cols
+  FROM
+     pg_class cc
+  JOIN pg_namespace nn ON cc.relnamespace = nn.oid AND nn.nspname <> 'information_schema'
+  LEFT JOIN
+  (
+    SELECT
+      ma,bs,foo.nspname,foo.relname,
+      (datawidth+(hdr+ma-(case when hdr%ma=0 THEN ma ELSE hdr%ma END)))::numeric AS datahdr,
+      (maxfracsum*(nullhdr+ma-(case when nullhdr%ma=0 THEN ma ELSE nullhdr%ma END))) AS nullhdr2
+    FROM (
+      SELECT
+        ns.nspname, tbl.relname, hdr, ma, bs,
+        SUM((1-coalesce(null_frac,0))*coalesce(avg_width, 2048)) AS datawidth,
+        MAX(coalesce(null_frac,0)) AS maxfracsum,
+        hdr+(
+          SELECT 1+count(*)/8
+          FROM pg_stats s2
+          WHERE null_frac<>0 AND s2.schemaname = ns.nspname AND s2.tablename = tbl.relname
+        ) AS nullhdr
+      FROM pg_attribute att 
+      JOIN pg_class tbl ON att.attrelid = tbl.oid
+      JOIN pg_namespace ns ON ns.oid = tbl.relnamespace 
+      LEFT JOIN pg_stats s ON s.schemaname=ns.nspname
+      AND s.tablename = tbl.relname
+      AND s.inherited=false
+      AND s.attname=att.attname,
+      (
+        SELECT
+          (SELECT current_setting('block_size')::numeric) AS bs,
+            CASE WHEN SUBSTRING(SPLIT_PART(v, ' ', 2) FROM '#[0-9]+.[0-9]+#%' for '#')
+              IN ('8.0','8.1','8.2') THEN 27 ELSE 23 END AS hdr,
+          CASE WHEN v ~ 'mingw32' OR v ~ '64-bit' THEN 8 ELSE 4 END AS ma
+        FROM (SELECT version() AS v) AS foo
+      ) AS constants
+      WHERE att.attnum > 0 AND tbl.relkind='r'
+      GROUP BY 1,2,3,4,5
+    ) AS foo
+  ) AS rs
+  ON cc.relname = rs.relname AND nn.nspname = rs.nspname
+  LEFT JOIN pg_index i ON indrelid = cc.oid
+  LEFT JOIN pg_class c2 ON c2.oid = i.indexrelid
+) AS sml ORDER BY totalwastedbytes DESC
+) t where totalwastedbytes/1024/1024 > 1024;
+
+##### 数据库 db1 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+##### 数据库 db2 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+##### 数据库 db3 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+##### 数据库 francs 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+##### 数据库 francs1 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+##### 数据库 skytf 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+##### 数据库 source_db 
+ db | schemaname | tablename | tups | pages | otta | tbloat | wastedpages | wastedbytes | wastedsize | iname | itups | ipages | iotta | ibloat | wastedipages | wastedibytes | wastedisize | totalwastedbytes 
+----+------------+-----------+------+-------+------+--------+-------------+-------------+------------+-------+-------+--------+-------+--------+--------------+--------------+-------------+------------------
+(0 rows)
+
+
+
+########### sql5: 检查垃圾数据 ###############
+sql5: select schemaname,relname,n_live_tup,n_dead_tup from pg_stat_all_tables where n_live_tup>0 and n_dead_tup/n_live_tup>0.2 and schemaname not in ('pg_toast','pg_catalog');
+##### 数据库 db1 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+##### 数据库 db2 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+##### 数据库 db3 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+##### 数据库 francs 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+##### 数据库 francs1 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+##### 数据库 skytf 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+##### 数据库 source_db 
+ schemaname | relname | n_live_tup | n_dead_tup 
+------------+---------+------------+------------
+(0 rows)
+
+
+
+########### sql6: 检查序列是否正常 ###############
+sql6: do language plpgsql $$
+declare
+  v_seq name; 
+  v_max int8 := 0; 
+  v_last int8 := 0;
+begin
+  for v_seq in 
+    select quote_ident(t2.nspname) || '.' || quote_ident(t1.relname) from pg_class t1, pg_namespace t2 where t1.relnamespace=t2.oid and relkind='S' 
+  loop
+    execute 'select max_value,last_value from '||v_seq into v_max, v_last; 
+    if v_max-v_last<500000000 then 
+      raise notice 'Warning seq % last % max %', v_seq, v_last, v_max ; 
+    -- else
+    --   raise notice 'Normal seq % last % max %', v_seq, v_last, v_max ; 
+    end if;
+  end loop;
+end;
+$$;
+##### 数据库 db1 
+DO
+##### 数据库 db2 
+DO
+##### 数据库 db3 
+DO
+##### 数据库 francs 
+DO
+##### 数据库 francs1 
+DO
+##### 数据库 skytf 
+DO
+##### 数据库 source_db 
+DO
+
+
+########### sql7: 检查分区表 ###############
+sql7: SELECT
+    nspname ,
+    relname ,
+    COUNT(*) AS partition_num
+FROM
+    pg_class c ,
+    pg_namespace n ,
+    pg_inherits i
+WHERE
+    c.oid = i.inhparent
+    AND c.relnamespace = n.oid
+    AND c.relhassubclass
+    AND c.relkind = 'r'
+GROUP BY 1,2 ORDER BY partition_num DESC;
+##### 数据库 db1 
+ nspname | relname | partition_num 
+---------+---------+---------------
+(0 rows)
+
+##### 数据库 db2 
+ nspname | relname | partition_num 
+---------+---------+---------------
+(0 rows)
+
+##### 数据库 db3 
+ nspname | relname | partition_num 
+---------+---------+---------------
+(0 rows)
+
+##### 数据库 francs 
+ nspname |  relname  | partition_num 
+---------+-----------+---------------
+ francs  | test_full |            11
+ francs  | test_1    |             2
+(2 rows)
+
+##### 数据库 francs1 
+ nspname |  relname  | partition_num 
+---------+-----------+---------------
+ francs  | test_full |            11
+ francs  | test_1    |             2
+(2 rows)
+
+##### 数据库 skytf 
+ nspname | relname | partition_num 
+---------+---------+---------------
+(0 rows)
+
+##### 数据库 source_db 
+ nspname | relname | partition_num 
+---------+---------+---------------
+(0 rows)
+
+
+
+--7.4 回滚比例
+  datname  |     rollback_ratio     |       hit_ratio        
+-----------+------------------------+------------------------
+ template1 | 0.00000000000000000000 | 0.00000000000000000000
+ template0 | 0.00000000000000000000 | 0.00000000000000000000
+ postgres  | 0.00947439657117076472 | 0.99814612946255683530
+ source_db | 0.00150150150150150150 | 0.99846808416504134882
+ skytf     | 0.00150037509377344336 | 0.99846385625687428946
+ francs    | 0.00187195806813927368 | 0.99855606025875524910
+ db1       | 0.00150037509377344336 | 0.99846271242139503278
+ db2       | 0.00150037509377344336 | 0.99846271242139503278
+ db3       | 0.00150037509377344336 | 0.99846271242139503278
+ francs1   | 0.00150037509377344336 | 0.99852729320341000606
+(10 rows)
+
+
+
+--7.5 长事务
